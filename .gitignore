@@ -44,3 +44,11 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/.vs
+/CadastroCliente.API/bin/Debug/netcoreapp3.1
+/CadastroCliente.API/obj
+*.user
+/CadastroClienteEntity/bin/Debug/netcoreapp3.1
+/CadastroClienteEntity/obj
+/CadastroClienteServices/bin/Debug/netcoreapp3.1
+/CadastroClienteServices/obj
