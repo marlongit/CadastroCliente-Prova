@@ -1,4 +1,4 @@
-﻿using CadastroClienteServices.Mapping;
+using CadastroClienteServices.Mapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
@@ -11,7 +11,7 @@ namespace CadastroClienteServices.Infraestrutura
 		{
 		}
 
-		public const string connectionString = "Server=NOTE-MC;Database=clientesBD;User ID=sa; Password=*****";
+		public const string connectionString = "Server=server;Database=clientesBD;User ID=user; Password=***";
 
 		private static ConnectionSession _instance;
 

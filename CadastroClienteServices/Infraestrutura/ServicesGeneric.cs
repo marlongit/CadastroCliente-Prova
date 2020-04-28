@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 
 namespace CadastroClienteServices.Infraestrutura
 {
@@ -98,11 +100,13 @@ namespace CadastroClienteServices.Infraestrutura
 			{
 				using (var session = sessionFactory.OpenSession())
 				{
-					return session.CreateSQLQuery(query).List<T>();
+					var result = session.CreateSQLQuery(query);
+
+          return result.List<T>().ToList();
 				}
 			}
 		}
-		public SqlDataReader ExecuteQuery(string queryString, Dictionary<string, object> parameters)
+		public List<T> ExecuteQuery<T>(string queryString, Dictionary<string, object> parameters) 
 		{
 			using (SqlConnection connection = new SqlConnection(ConnectionSession.connectionString))
 			{
@@ -113,10 +117,29 @@ namespace CadastroClienteServices.Infraestrutura
 					command.Parameters.AddWithValue(param.Key, param.Value);
 				}
 
-				return command.ExecuteReader();
-			}
+        var reader =  command.ExecuteReader();
+        return DataReaderMapToList<T>(reader);
+      }
 		}
-		public void ExecuteQuery(string queryString, TypeCommandSql typeCommandSql, Dictionary<string, object> parameters)
+    public static List<T> DataReaderMapToList<T>(IDataReader dr)
+    {
+      List<T> list = new List<T>();
+      T obj = default(T);
+      while (dr.Read())
+      {
+        obj = Activator.CreateInstance<T>();
+        foreach (PropertyInfo prop in obj.GetType().GetProperties())
+        {
+          if (!object.Equals(dr[prop.Name], DBNull.Value))
+          {
+            prop.SetValue(obj, dr[prop.Name], null);
+          }
+        }
+        list.Add(obj);
+      }
+      return list;
+    }
+    public void ExecuteQuery(string queryString, TypeCommandSql typeCommandSql, Dictionary<string, object> parameters)
 		{
 			using (SqlConnection connection = new SqlConnection(ConnectionSession.connectionString))
 			{
@@ -137,8 +160,7 @@ namespace CadastroClienteServices.Infraestrutura
 			}
 		}
 	}
-
-	public enum TypeCommandSql
+  	public enum TypeCommandSql
 	{
 		Insert = 1,
 		Update,
@@ -146,4 +168,3 @@ namespace CadastroClienteServices.Infraestrutura
 		Select
 	}
 }
-
